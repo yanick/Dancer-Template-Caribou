@@ -3,12 +3,15 @@ package MyApp;
 use strict;
 use warnings;
 
-use Test::More tests => 1;
+use Test::More tests => 3;
 
-use Dancer2;
-use Dancer2::Test;
+use Dancer '!pass';
+use Dancer::Test;
 
+set appdir => 't';
+set views => 't/views';
 set template => 'Caribou';
+set show_errors => 1;
 
 get '/hi/:name' => sub {
     template 'welcome' => { name => param('name') };

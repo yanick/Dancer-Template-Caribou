@@ -5,12 +5,12 @@ use warnings;
 
 use Test::More tests => 1;
 
-use Dancer2;
-use Dancer2::Test;
+use Dancer '!pass';
+use Dancer::Test;
 
 
 { 
-    package Dancer2::View::MyView;
+    package Dancer::View::MyView;
     use Moose;
     use Template::Caribou;
 
@@ -23,6 +23,8 @@ use Dancer2::Test;
 }
 
 setting template => 'Caribou';
+setting warnings => 1;
+setting show_errors => 1;
 
 get '/' => sub { template 'MyView' };
 
