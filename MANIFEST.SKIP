@@ -1,6 +1,6 @@
 ^dist.ini
 ^MANIFEST.SKIP
-Dancer2-Template-Caribou.*
+Dancer\d*-Template-Caribou.*
 ^\.gitignore
 ^\.git
 ^\.build
