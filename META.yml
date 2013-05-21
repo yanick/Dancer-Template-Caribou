@@ -1,0 +1,47 @@
+---
+abstract: 'Template::Caribou wrapper for Dancer'
+author:
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+build_requires:
+  Dancer: 0
+  Dancer::Test: 0
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Moose: 0
+  Template::Caribou: 0
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Template-Caribou
+provides:
+  Dancer::Template::Caribou:
+    file: lib/Dancer/Template/Caribou.pm
+    version: v0.1.0
+requires:
+  Dancer::Config: 0
+  Dancer::Template::Abstract: 0
+  FindBin: 0
+  Moo: 0
+  Moose::Util: 0
+  Path::Iterator::Rule: 0
+  Path::Tiny: 0
+  strict: 0
+  utf8: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dancer-Template-Caribou
+  homepage: http://search.cpan.org/dist/Dancer-Template-Caribou/
+  repository: https://github.com/yanick/Dancer-Template-Caribou.git
+version: 0.1.0
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Yanick Champoux <yanick@cpan.org>'

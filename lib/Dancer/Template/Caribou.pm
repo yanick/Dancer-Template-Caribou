@@ -1,4 +1,10 @@
 package Dancer::Template::Caribou;
+BEGIN {
+  $Dancer::Template::Caribou::AUTHORITY = 'cpan:YANICK';
+}
+{
+  $Dancer::Template::Caribou::VERSION = '0.1.0';
+}
 #ABSTRACT: Template::Caribou wrapper for Dancer
 
 use strict;
@@ -187,8 +193,17 @@ sub view_exists {
 
 1;
 
-
 __END__
+
+=pod
+
+=head1 NAME
+
+Dancer::Template::Caribou - Template::Caribou wrapper for Dancer
+
+=head1 VERSION
+
+version 0.1.0
 
 =head1 SYNOPSIS
 
@@ -272,7 +287,6 @@ which would be invoqued via
         template 'welcome' => { name => param('name') };
     };
 
-
 =head3 The inner template files
 
 All files with a '.bou' extension found in the same directory as the 'bou'
@@ -325,7 +339,6 @@ the template class. Again, to take our example:
     # in /views/howdie/inner
     h1 { 'hullo ' . $self->name . '!' };
 
-
 =head1 CONFIGURATION
 
 =over
@@ -341,7 +354,17 @@ If set to C<true>, the Caribou object will verify if any of the
 template files have changed before rendering and, if that's the case,
 will self-update. Defaults to C<false>.
 
-
 =back
+
+=head1 AUTHOR
+
+Yanick Champoux <yanick@babyl.dyndns.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

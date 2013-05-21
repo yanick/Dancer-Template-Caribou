@@ -1,5 +1,8 @@
 Revision history for Dancer-Template-Caribou
 
-{{$NEXT}}
+0.1.0 2013-05-20
  - First version, unleashed on an unsuspecting world.
+
+ [STATISTICS]
+ - code churn: 16 files changed, 480 insertions(+), 17 deletions(-)
 
