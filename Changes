@@ -4,6 +4,7 @@ Revision history for Dancer-Template-Caribou
  [API CHANGES]
 
  [BUG FIXES]
+ - Set the version number for the T::C requirement
 
  [DOCUMENTATION]
 
