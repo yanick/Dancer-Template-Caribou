@@ -1,18 +1,11 @@
 Revision history for Dancer-Template-Caribou
 
-{{$NEXT}}
- [API CHANGES]
-
+0.1.1 2013-05-22
  [BUG FIXES]
  - Set the version number for the T::C requirement
 
- [DOCUMENTATION]
-
- [ENHANCEMENTS]
-
- [NEW FEATURES]
-
  [STATISTICS]
+ - code churn: 3 files changed, 21 insertions(+), 3 deletions(-)
 
 0.1.0 2013-05-20
  - First version, unleashed on an unsuspecting world.
