@@ -11,10 +11,8 @@ use Dancer::Test;
 
 { 
     package Dancer::View::MyView;
-    use Moose;
-    use Template::Caribou;
 
-    with 'Template::Caribou';
+    use Template::Caribou;
 
     template page => sub {
         "hello world";
@@ -25,6 +23,7 @@ use Dancer::Test;
 setting template => 'Caribou';
 setting warnings => 1;
 setting show_errors => 1;
+setting log => 'console';
 
 get '/' => sub { template 'MyView' };
 

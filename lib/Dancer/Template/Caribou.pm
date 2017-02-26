@@ -74,11 +74,8 @@ package $name;
 use Moose::Role;
 use Template::Caribou;
 
-with 'Template::Caribou';
-
 with 'Template::Caribou::Files' => {
     dirs => [ '$bou_dir' ],
-    auto_reload => 1,
 };
 
 # line 1 "$bou"
@@ -110,10 +107,7 @@ sub generate_view_class {
     eval qq{
 package $name;
 
-use Moose;
 use Template::Caribou;
-
-with 'Template::Caribou';
 
 with 'Template::Caribou::Files' => {
     dirs => [ '$bou_dir' ],
@@ -149,6 +143,9 @@ sub layout {
 sub render {
     my( $self, $template, $tokens ) = @_;
 
+    $DB::single = 1;
+    
+
     $template =~ s/\.bou$//;
 
     my $class = $self->view_class->{$template};
@@ -158,7 +155,7 @@ sub render {
       $c =~ s#/#::#g;
             $c = join '::', $self->namespace, $c;
           die "template '$template' not found\n"
-                unless eval { $c->DOES('Template::Caribou') };
+                unless eval { $c->DOES('Template::Caribou::Role') };
            $class = $c;
       }
 
@@ -287,11 +284,15 @@ above, we could change it into
 
 
     # in /views/howdie/page
-    html {
-        head { title { 'My App' } };
-        body {
-            h1 { 'howdie ' . $self->name . '!' };
-        };
+    sub {
+        my $self = shift;
+
+        html {
+            head { title { 'My App' } };
+            body {
+                h1 { 'howdie ' . $self->name . '!' };
+            };
+        }
     }
 
 =head3 Layouts as roles
@@ -309,11 +310,15 @@ the template class. Again, to take our example:
     # instead than in the 'bou' file 
     use Template::Caribou::Tags::HTML ':all';
 
-    html {
-        head { title { 'My App' } };
-        body {
-            show( 'inner' );
-        };
+    sub {
+        my $self = shift;
+
+        html {
+            head { title { 'My App' } };
+            body {
+                $self->inner_template;
+            };
+        }
     }
 
     # in /views/hullo/bou
@@ -323,7 +328,7 @@ the template class. Again, to take our example:
     has name => ( is => 'ro' );
 
     # in /views/howdie/inner
-    h1 { 'hullo ' . $self->name . '!' };
+    sub { my $self = shift; h1 { 'hullo ' . $self->name . '!' } }
 
 
 =head1 CONFIGURATION
@@ -334,13 +339,6 @@ the template class. Again, to take our example:
 
 The namespace under which the Caribou classes are created.
 defaults to C<Dancer::View>.
-
-=item auto_reload
-
-If set to C<true>, the Caribou object will verify if any of the 
-template files have changed before rendering and, if that's the case,
-will self-update. Defaults to C<false>.
-
 
 =back
 
