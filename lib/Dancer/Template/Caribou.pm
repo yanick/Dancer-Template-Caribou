@@ -1,6 +1,8 @@
 package Dancer::Template::Caribou;
 #ABSTRACT: Template::Caribou wrapper for Dancer
 
+# TODO I think the template loading can be simplified
+
 use strict;
 use warnings;
 
