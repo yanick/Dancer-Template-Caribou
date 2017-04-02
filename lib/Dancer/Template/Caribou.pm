@@ -11,6 +11,7 @@ use Path::Iterator::Rule;
 use Moose::Util qw/ with_traits find_meta /;
 use FindBin;
 use Dancer::Config qw/ setting /;
+use Module::Runtime qw/ use_module /;
 
 use Moo;
 
@@ -23,116 +24,36 @@ has 'default_tmpl_ext' => (
     default => sub { 'bou' },
 );
 
-has view_class => (
+has main => (
     is => 'ro',
-    default => sub { { } },
-);
+    lazy => 1,
+    default => sub {
+        'page'
+    },
 
-has layout_class => (
-    is => 'ro',
-    default => sub { { } },
 );
 
 has namespace => (
     is => 'ro',
     lazy => 1,
+    predicate => 'has_namespace',
     default => sub {
+        use DDP;
+        $DB::single = 1;
+        
+        p $_[0]->config;
         $_[0]->config->{namespace} || 'Dancer::View';
     },
 );
 
-sub BUILD {
-    my $self = shift;
-
-    my $views_dir = setting 'views';
-
-    my @views =
-    Path::Iterator::Rule->new->skip_dirs('layouts')->file->name('bou')->all(
-        $views_dir );
-
-    $self->generate_view_class( $_ ) for @views;
-
-    my @layouts =
-    Path::Iterator::Rule->new->file->name('bou')->all(
-        path( $views_dir, 'layouts' ) );
-
-    $self->generate_layout_class( $_ ) for @layouts;
-}
-
-sub generate_layout_class {
-    my( $self, $bou ) = @_;
-
-    my $bou_dir = path($bou)->parent;
-    my $segment = ''.path($bou)->relative( setting( 'views').'/layouts')->parent;
-
-    ( my $name = $segment ) =~ s#/#::#;
-    $name = join '::', $self->namespace, $name;
-
-    my $inner = path($bou)->slurp;
-
-    eval qq{
-package $name;
-
-use Moose::Role;
-use Template::Caribou;
-
-with 'Template::Caribou::Files' => {
-    dirs => [ '$bou_dir' ],
-};
-
-# line 1 "$bou"
-
-$inner
-
-1;
-} unless find_meta( $name );
-
-    warn $@ if $@;
-
-    $self->layout_class->{$segment} = $name;
-
-}
-
-sub generate_view_class {
-    my( $self, $bou ) = @_;
-
-    my $bou_dir = path($bou)->parent;
-    my $segment = ''.path($bou)->relative(setting('views'))->parent;
-
-    ( my $name = $segment ) =~ s#/#::#;
-    $name = join '::', $self->namespace, $name;
-
-    return if $self->layout_class->{$segment};
-
-    my $inner = path($bou)->slurp;
-
-    eval qq{
-package $name;
-
-use Template::Caribou;
-
-with 'Template::Caribou::Files' => {
-    dirs => [ '$bou_dir' ],
-    auto_reload => 1,
-};
-
-has app => (
+has layout_namespace => (
     is => 'ro',
-    handles => [ 'config' ],
+    lazy => 1,
+    default => sub {
+        $_[0]->config->{layout_namespace} 
+            or $_[0]->namespace . '::Layout';
+    },
 );
-
-# line 1 "$bou"
-
-$inner
-
-1;
-} unless find_meta($name);
-
-    warn $@ if $@;
-
-    $self->view_class->{$segment} = $name;
-
-}
 
 sub apply_layout {
     return $_[1];
@@ -146,30 +67,24 @@ sub render {
     my( $self, $template, $tokens ) = @_;
 
     $DB::single = 1;
-    
 
-    $template =~ s/\.bou$//;
+    my $class = $template;
+    $class = join '::', $self->namespace, $class
+        unless $class =~ s/^\+//;
 
-    my $class = $self->view_class->{$template};
+    use_module($class);
 
-    unless ( $class ) {
-       my $c = $template;
-      $c =~ s#/#::#g;
-            $c = join '::', $self->namespace, $c;
-          die "template '$template' not found\n"
-                unless eval { $c->DOES('Template::Caribou::Role') };
-           $class = $c;
-      }
+    # TODO build a cache of layout + class classes?
+    if ( my $layout = Dancer::App->current->setting('layout') ) {
+        my $layout_class = $layout;
+        $layout_class = join '::', $self->layout_namespace, $layout_class
+            unless $layout_class =~ s/^\+//;
 
-    if ( my $lay = Dancer::App->current->setting('layout') ) {
-        my $role = $self->layout_class->{$lay}
-            or die "layout '$lay' not defined\n";
-
-        $class = with_traits( $class, $role, 
-        )
+        $class = with_traits( $class, use_module($layout_class) );
     }
 
-    my $x = $class->new( %$tokens)->render('page');
+    my $method = $self->main;
+    my $x = $class->new( %$tokens)->$method;
     use utf8;utf8::decode($x);
     return $x;
 }
@@ -212,8 +127,8 @@ __END__
 
 C<Dancer::Template::Caribou> is an interface for the L<Template::Caribou>
 template system. Be forewarned, both this module and C<Template::Caribou>
-itself are alpha-quality software and are still subject to any changes. <Caveat
-Maxima Emptor>.
+itself are alpha-quality software and are still subject to any changes. 
+B<Caveat Maxima Emptor>.
 
 =head2 Basic Usage
 
