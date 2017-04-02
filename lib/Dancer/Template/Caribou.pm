@@ -23,9 +23,16 @@ has default_template => (
     is => 'ro',
     lazy => 1,
     default => sub {
-        'page'
+        $_[0]->config->{default_template} || 'page';
     },
+);
 
+has default_layout_template => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+        $_[0]->config->{default_layout_template} || 'page';
+    },
 );
 
 has namespace => (
@@ -63,6 +70,8 @@ sub render {
 
     use_module($class);
 
+    my $method = $self->default_template;
+
     # TODO build a cache of layout + class classes?
     if ( my $layout = Dancer::App->current->setting('layout') ) {
         my $layout_class = $layout;
@@ -70,9 +79,9 @@ sub render {
             unless $layout_class =~ s/^\+//;
 
         $class = with_traits( $class, use_module($layout_class) );
+        $method = $self->default_layout_template;
     }
 
-    my $method = $self->default_template;
     my $x = $class->new( %$tokens)->$method;
     use utf8;utf8::decode($x);
     return $x;
@@ -101,9 +110,10 @@ __END__
 
     engines:
       Caribou:
-        namespace:    MyApp::View
-        layout_namespace: MyApp::View::Layout
-        default_template: page
+        namespace:               MyApp::View
+        layout_namespace:        MyApp::View::Layout
+        default_template:        inner_page
+        default_layout_template: page
 
     # and then in the application
     get '/' => sub { 
@@ -161,16 +171,31 @@ is equivalent to
 
 Defaults to C<page>.
 
+=item default_layout_template
+
+Entry template to use when a layout is provided. Defaults to C<page>.
+
 =item namespace 
 
 The namespace under which the Caribou template classes are.
 defaults to C<Dancer::View>.
+
+Template names can be prefixed with a plus sign if you want it to be used as an absolute namespace.
+
+    template 'Relative::View';       # -> Dancer::View::Relative::View
+    template '+My::Absolute::View';  # -> My::Absolute::View
 
 =item layout_namespace 
 
 The namespace under which the Caribou layout roles are.
 defaults to the C<::Layout> sub-namespace under the template
 namespace.
+
+Like template names, layout names can be prefixed with a plus sign for
+absolute namespaces;
+
+    set layout => 'My::Relative';  # -> Dancer::View::Layour::My::Relative
+    set layout => '+My::Absolute'; # -> My::Absolute
 
 =back
 
