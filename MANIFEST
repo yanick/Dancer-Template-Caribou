@@ -7,7 +7,6 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
-README
 README.mkdn
 SIGNATURE
 cpanfile
@@ -25,5 +24,4 @@ t/views/hullo/inner_template.bou
 t/views/layouts/main/bou
 t/views/layouts/main/page.bou
 t/views/welcome/bou
-xt/release/pause-permissions.t
 xt/release/unused-vars.t

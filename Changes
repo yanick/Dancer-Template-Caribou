@@ -4,6 +4,7 @@ Revision history for Dancer-Template-Caribou
   [ API CHANGES ]
 
   [ BUG FIXES ]
+  - fix discrepancies with the new Template::Caribou interface.
 
   [ DOCUMENTATION ]
 
